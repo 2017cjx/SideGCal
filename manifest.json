@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "SideGCal",
+  "version": "1.0.0",
+  "description": "View today's Google Calendar events in a slim sidebar",
+
+  "permissions": ["identity", "sidePanel", "storage"],
+
+  "oauth2": {
+    "client_id": "605199120260-0gq7kdvono0dp8hrahos451nmunjovbt.apps.googleusercontent.com",
+    "scopes": ["https://www.googleapis.com/auth/calendar.events"]
+  },
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "side_panel": {
+    "default_path": "sidepanel/sidepanel.html"
+  },
+
+  "action": {
+    "default_title": "Open Calendar Sidebar",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
