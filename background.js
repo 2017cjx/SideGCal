@@ -168,8 +168,11 @@ async function handleUpdateEvent(eventId, eventData, sendResponse) {
     
     const event = buildEventPayload(eventData);
     
+    // Use the calendarId from eventData if provided, otherwise default to 'primary'
+    const calendarId = eventData.calendarId || 'primary';
+    
     const response = await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}`,
+      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${eventId}`,
       {
         method: 'PUT',
         headers: {
@@ -186,7 +189,7 @@ async function handleUpdateEvent(eventId, eventData, sendResponse) {
     }
     
     const updatedEvent = await response.json();
-    sendResponse({ success: true, event: transformEvent(updatedEvent) });
+    sendResponse({ success: true, event: transformEvent(updatedEvent, calendarId) });
   } catch (error) {
     console.error('Update event error:', error);
     sendResponse({ success: false, error: error.message });
@@ -270,16 +273,9 @@ function getAuthToken(interactive) {
 
 // Fetch events from Google Calendar API
 async function fetchCalendarEvents(token, startDate, endDate) {
-  const params = new URLSearchParams({
-    timeMin: startDate.toISOString(),
-    timeMax: endDate.toISOString(),
-    singleEvents: 'true',
-    orderBy: 'startTime',
-    maxResults: '50'
-  });
-  
-  const response = await fetch(
-    `https://www.googleapis.com/calendar/v3/calendars/primary/events?${params}`,
+  // First, get the list of all calendars
+  const calendarListResponse = await fetch(
+    'https://www.googleapis.com/calendar/v3/users/me/calendarList',
     {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -288,17 +284,84 @@ async function fetchCalendarEvents(token, startDate, endDate) {
     }
   );
   
-  if (!response.ok) {
-    throw new Error(`API error: ${response.status}`);
+  if (!calendarListResponse.ok) {
+    throw new Error(`Calendar list API error: ${calendarListResponse.status}`);
   }
   
-  const data = await response.json();
+  const calendarListData = await calendarListResponse.json();
   
-  return (data.items || []).map(transformEvent);
+  // Filter to only selected/visible calendars
+  const selectedCalendars = (calendarListData.items || []).filter(
+    calendar => calendar.selected === true
+  );
+  
+  // Build query parameters for events
+  const params = new URLSearchParams({
+    timeMin: startDate.toISOString(),
+    timeMax: endDate.toISOString(),
+    singleEvents: 'true',
+    orderBy: 'startTime',
+    maxResults: '50'
+  });
+  
+  // Fetch events from each calendar in parallel
+  const eventPromises = selectedCalendars.map(async (calendar) => {
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendar.id)}/events?${params}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      if (!response.ok) {
+        console.error(`Failed to fetch events for calendar ${calendar.id}: ${response.status}`);
+        return [];
+      }
+      
+      const data = await response.json();
+      
+      // Transform events and add calendar metadata
+      return (data.items || []).map(event => 
+        transformEvent(event, calendar.id, calendar.backgroundColor, calendar.accessRole)
+      );
+    } catch (error) {
+      console.error(`Error fetching events for calendar ${calendar.id}:`, error);
+      return [];
+    }
+  });
+  
+  // Wait for all calendar fetches to complete
+  const eventArrays = await Promise.all(eventPromises);
+  
+  // Merge all events together
+  const allEvents = eventArrays.flat();
+  
+  // Sort by start time
+  return allEvents.sort((a, b) => {
+    const startA = new Date(a.start);
+    const startB = new Date(b.start);
+    return startA - startB;
+  });
 }
 
 // Transform API event to our format
-function transformEvent(event) {
+function transformEvent(event, calendarId = 'primary', calendarColor = null, calendarAccessRole = null) {
+  // Check if event is readonly
+  // accessRole can be: "owner", "writer", "reader", "freeBusyReader"
+  // Also check if calendar is readonly
+  const isReadOnly = calendarAccessRole === 'reader' || calendarAccessRole === 'freeBusyReader';
+  
+  // Check if event is from external calendar
+  // External calendar = not primary calendar AND readonly (can't edit)
+  // Primary calendar events can always be edited via the primary endpoint
+  // Non-primary calendar events with write access (owner/writer) can be edited, so they're not external
+  // Only non-primary calendars with read-only access (reader/freeBusyReader) are considered external
+  const isExternal = calendarId !== 'primary' && isReadOnly;
+  
   return {
     id: event.id,
     title: event.summary || '(No title)',
@@ -309,7 +372,11 @@ function transformEvent(event) {
     description: event.description || null,
     htmlLink: event.htmlLink,
     colorId: event.colorId || null,
+    calendarId: calendarId,
+    calendarColor: calendarColor || null,
     hangoutLink: event.hangoutLink || null,
-    attendees: event.attendees || []
+    attendees: event.attendees || [],
+    isReadOnly: isReadOnly,
+    isExternal: isExternal
   };
 }

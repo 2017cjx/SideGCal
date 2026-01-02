@@ -4,11 +4,14 @@
   "version": "1.0.0",
   "description": "View today's Google Calendar events in a slim sidebar",
 
-  "permissions": ["identity", "sidePanel", "storage"],
+  "permissions": ["identity", "sidePanel", "storage", "tabs"],
 
   "oauth2": {
     "client_id": "605199120260-0gq7kdvono0dp8hrahos451nmunjovbt.apps.googleusercontent.com",
-    "scopes": ["https://www.googleapis.com/auth/calendar.events"]
+    "scopes": [
+      "https://www.googleapis.com/auth/calendar.events",
+      "https://www.googleapis.com/auth/calendar.readonly"
+    ]
   },
 
   "background": {

@@ -11,7 +11,7 @@
   <div id="login-screen" class="screen">
     <div class="login-container">
       <div class="login-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8ab4f8" stroke-width="2">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
           <line x1="16" y1="2" x2="16" y2="6"></line>
           <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -56,6 +56,15 @@
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
         </button>
+        <button id="open-calendar-btn" class="icon-btn" title="Open Google Calendar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path>
+          </svg>
+        </button>
         <button id="refresh-btn" class="icon-btn" title="Refresh">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="23 4 23 10 17 10"></polyline>
@@ -87,7 +96,7 @@
 
       <!-- Empty State -->
       <div id="empty-state" class="empty-state hidden">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dadce0" stroke-width="1.5">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="1.5">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
           <line x1="16" y1="2" x2="16" y2="6"></line>
           <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -105,13 +114,23 @@
 
       <!-- All Day Events -->
       <div id="all-day-events" class="all-day-section hidden">
-        <div class="section-label">All day</div>
+        <div class="section-header">
+          <div class="section-label">All day</div>
+          <button id="all-day-toggle" class="section-toggle" aria-label="Toggle all day events">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
         <div id="all-day-list" class="event-list"></div>
       </div>
 
       <!-- Timed Events -->
       <div id="timed-events" class="timed-events"></div>
     </div>
+    
+    <!-- Notification Toast Container -->
+    <div id="notification-container" class="notification-container"></div>
   </div>
 
   <!-- Event Form Modal -->
@@ -164,7 +183,7 @@
         <!-- Location -->
         <div class="form-group">
           <div class="input-with-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#70757a" stroke-width="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="2">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
@@ -175,7 +194,7 @@
         <!-- Description -->
         <div class="form-group">
           <div class="input-with-icon textarea-wrapper">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#70757a" stroke-width="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="2">
               <line x1="17" y1="10" x2="3" y2="10"></line>
               <line x1="21" y1="6" x2="3" y2="6"></line>
               <line x1="21" y1="14" x2="3" y2="14"></line>
