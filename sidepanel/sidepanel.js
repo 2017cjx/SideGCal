@@ -407,7 +407,21 @@ function renderEvents(events) {
   
   if (allDayEvents.length > 0) {
     allDaySectionEl.classList.remove('hidden');
-    allDayListEl.innerHTML = allDayEvents.map(e => createEventCard(e)).join('');
+    // Determine status for all-day events
+    // All-day events should not be dimmed on the current day - only dim them when viewing past dates
+    const now = new Date();
+    const isToday = isSameDay(currentDate, now);
+    allDayListEl.innerHTML = allDayEvents.map(e => {
+      let status = '';
+      // Only mark as past if viewing a past date (not today)
+      // On today, all-day events remain bright until the day ends
+      if (!isToday && currentDate < now) {
+        // If viewing a past date, all events are past
+        status = 'past';
+      }
+      // If viewing today, don't mark all-day events as past (they stay bright all day)
+      return createEventCard(e, status);
+    }).join('');
     // Restore toggle state (default: expanded)
     const isExpanded = getAllDayToggleState();
     updateAllDayToggleUI(isExpanded);

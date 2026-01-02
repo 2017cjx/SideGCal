@@ -770,8 +770,19 @@ body {
 
 /* Past event styling */
 .timeline-event-card.past {
-  background: #2d2e30; /* Slightly darker but still fully opaque */
-  opacity: 1;
+  background: #252525 !important; /* Darker background for past events */
+}
+
+.timeline-event-card.past .timeline-event-title {
+  color: #9aa0a6; /* Lighter gray for past event titles */
+}
+
+.timeline-event-card.past .timeline-event-time {
+  color: #5f6368; /* Darker gray for past event times */
+}
+
+.timeline-event-card.past .event-location {
+  color: #5f6368; /* Darker gray for past event locations */
 }
 
 /* Current event styling */
@@ -779,7 +790,6 @@ body {
   background: #303134; /* Fully opaque */
   z-index: 3;
   opacity: 1;
-  border-left: 2px solid var(--color-primary);
 }
 
 .timeline-event-card.current .timeline-event-color-bar {
@@ -826,13 +836,24 @@ body {
 
 /* Past event styling */
 .event-card.past {
-  opacity: 0.6;
+  background: #252525; /* Darker background for past events */
+}
+
+.event-card.past .event-title {
+  color: #9aa0a6; /* Lighter gray for past event titles */
+}
+
+.event-card.past .event-time {
+  color: #5f6368; /* Darker gray for past event times */
+}
+
+.event-card.past .event-location {
+  color: #5f6368; /* Darker gray for past event locations */
 }
 
 /* Current event styling */
 .event-card.current {
   background: rgba(138, 180, 248, 0.15);
-  border-left: 3px solid var(--color-primary);
 }
 
 /* Scrollbar styling */
@@ -899,7 +920,7 @@ body {
 }
 
 .modal-small {
-  max-width: 280px;
+  max-width: 100%;
 }
 
 .modal-header {
@@ -934,7 +955,7 @@ body {
 
 /* Event Form */
 .event-form {
-  padding: var(--spacing-md) var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-md);
 }
 
 .form-group {
@@ -1066,7 +1087,8 @@ input[type="time"]:disabled {
 }
 
 .time-input {
-  max-width: 110px;
+  max-width: 150px;
+  min-width: 120px;
 }
 
 .input-with-icon {
